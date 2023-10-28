@@ -4,8 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>C</title>
+    <script src="/chat.js"></script>
   </head>
   <body>
     <h1>this is c, I'm in iframe</h1>
+    <input type="text" />
+    <button>send msg to A</button>
+    <script>
+      const chat = new Chat("http://localhost:3000");
+      document.querySelector("button").addEventListener("click", () => {
+        const value = document.querySelector("input")?.value;
+        chat.sendMessage({ id: "c", value });
+        chat.open();
+      });
+      chat.onMessage((data) => {
+        console.log(data);
+      });
+    </script>
   </body>
 </html>

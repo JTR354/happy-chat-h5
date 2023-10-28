@@ -8,5 +8,29 @@
   </head>
   <body>
     <h1>This is a</h1>
+    <button id="open">open b</button>
+
+    <input type="text" />
+    <button id="send">send to b</button>
+    <dialog open>
+      <button id="login">login</button>
+    </dialog>
+    <script>
+      const chat = new Chat("http://localhost:4000", ["http://localhost:5858"]);
+      document.querySelector("#open").addEventListener("click", () => {
+        chat.open();
+      });
+      document.querySelector("#login").addEventListener("click", () => {
+        document.querySelector("dialog").hidden = true;
+        chat.getLatestMessage();
+      });
+      chat.onMessage((data) => {
+        console.log(data);
+      });
+      document.querySelector("#send").addEventListener("click", () => {
+        const value = document.querySelector("input")?.value;
+        chat.sendMessage({ id: "a", value });
+      });
+    </script>
   </body>
 </html>

@@ -10,7 +10,9 @@ function createApp(port, html) {
         return;
       }
       if (url.endsWith(".js")) {
-        res.writeHead(200, "Content-Type: text/javascript");
+        res.writeHead(200, {
+          "Content-Type": "text/javascript",
+        });
         res.end(fs.readFileSync("./chat.js"));
         return;
       }
