@@ -6,6 +6,8 @@ void (function () {
     static STATE_CLOSE = Chat.SYMBOL + "CLOSE";
     static JSON_DATA = Chat.SYMBOL + "type:json;";
     static GET_LATEST_MESSAGE = Chat.SYMBOL + "LATEST_MESSAGE";
+    static PARENT_INFORMATION = Chat.SYMBOL + "PARENT_INFORMATION";
+
     static create(...args) {
       if (this.instance == null) {
         this.instance = new Chat(...args);
@@ -23,6 +25,9 @@ void (function () {
       this.close = this.listenerMessage();
       this.safetySource = safetySource || [];
       this.safetySource.push(url);
+      if (!window.name) {
+        window.name = url;
+      }
     }
     listenerMessage() {
       const handler = (event) => {
@@ -57,6 +62,10 @@ void (function () {
             this.send(this.latestMessage);
             return;
           }
+          if (data.startsWith(Chat.PARENT_INFORMATION)) {
+            this.parentInformation = data;
+            return;
+          }
 
           this.listeners.forEach(([cType, callback]) => {
             if (cType === "message") {
@@ -81,7 +90,22 @@ void (function () {
         },
       ]);
     }
-    back() {}
+    back() {
+      const isTop = window.top === window;
+      if (!isTop) return;
+      const parentInformation = this.getParentInformation();
+      if (parentInformation == null) return;
+      if (!parentInformation.isTop) return;
+      console.log(parentInformation);
+      if (this.parent) {
+        this.parent.focus();
+      } else {
+        this.parent = window.open(
+          parentInformation.href + "#opened",
+          parentInformation.name
+        );
+      }
+    }
     open(target = this.url + Chat.SYMBOL, feature) {
       if (this.isChild()) {
         this.back();
@@ -92,7 +116,8 @@ void (function () {
         return;
       }
 
-      window.open("", target, feature);
+      // window.open("", target, feature);
+      this.target = target;
       setTimeout(() => {
         this.opener = window.open(this.url, target, feature);
       });
@@ -102,13 +127,30 @@ void (function () {
     connect() {
       this.disconnect();
       this.timer = setInterval(() => {
-        console.log(this.readyState);
+        console.info(this.readyState);
         if (this.opener?.closed) {
           this.disconnect();
           return;
         }
         this.send(Chat.STATE_CONNECT);
+        this.sendParentInformation();
       }, 500);
+    }
+    sendParentInformation() {
+      const isTop = window.top === window;
+      const data = {
+        isTop,
+        href: window.location.href,
+        name: window.name,
+      };
+      this.send(Chat.PARENT_INFORMATION + JSON.stringify(data));
+    }
+    getParentInformation() {
+      if (this.parentInformation) {
+        return JSON.parse(
+          this.parentInformation.replace(Chat.PARENT_INFORMATION, "")
+        );
+      }
     }
     disconnect() {
       clearInterval(this.timer);

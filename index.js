@@ -6,6 +6,11 @@ function createApp(port, html) {
     .createServer((req, res) => {
       const { url } = req;
       if (["/", "/login"].includes(url)) {
+        res.writeHead(200, {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Security-Policy":
+            "frame-ancestors http://localhost:5858 http://localhost:4000 http://localhost:3000",
+        });
         res.end(fs.readFileSync(html));
         return;
       }

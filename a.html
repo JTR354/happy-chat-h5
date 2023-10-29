@@ -16,7 +16,7 @@
       <button id="login">login</button>
     </dialog>
     <script>
-      const chat = new Chat("http://localhost:4000", ["http://localhost:5858"]);
+      const chat = new Chat("http://localhost:5858", ["http://localhost:5858"]);
       document.querySelector("#open").addEventListener("click", () => {
         chat.open();
       });
@@ -30,6 +30,7 @@
       document.querySelector("#send").addEventListener("click", () => {
         const value = document.querySelector("input")?.value;
         chat.sendMessage({ id: "a", value });
+        chat.open();
       });
     </script>
   </body>
