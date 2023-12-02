@@ -24,8 +24,18 @@ router.post("/api/show", (ctx, next) => {
 
 router.get("/api/show", (ctx, next) => {
   return new Promise((resolve) => {
+    // mock to call HUB
     setTimeout(() => {
-      writeSSE(ctx, JSON.stringify({ a: "123" }));
+      writeSSE(
+        ctx,
+        JSON.stringify({
+          a: "123",
+          list: new Array(100).fill(1).map((it, i) => ({
+            id: i,
+            content: Math.random().toString(36).slice(-8),
+          })),
+        })
+      );
       resolve();
     }, 3000);
   });
