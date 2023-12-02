@@ -14,20 +14,25 @@ router.get("/", (ctx, next) => {
   next();
 });
 
-router.post("/api/show", (ctx, next) => {
+let id = "";
+router.post("/api/close-account", (ctx, next) => {
   ctx.set("Content-Type", "application/json");
 
-  ctx.body = { id: Date.now() };
+  id = Date.now();
+  // return the id to UI
+  ctx.body = { id };
 
   next();
 });
 
-router.get("/api/show", (ctx, next) => {
+router.get("/api/close-account", (ctx, next) => {
   return new Promise((resolve) => {
     // mock to call HUB
     setTimeout(() => {
+      // catch the id
       writeSSE(
         ctx,
+        id,
         JSON.stringify({
           a: "123",
           list: new Array(100).fill(1).map((it, i) => ({
@@ -41,7 +46,7 @@ router.get("/api/show", (ctx, next) => {
   });
 });
 
-function writeSSE(ctx, message) {
+function writeSSE(ctx, id, message) {
   ctx.res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
@@ -49,7 +54,7 @@ function writeSSE(ctx, message) {
     "Access-Control-Allow-Origin": "*",
   });
 
-  ctx.res.write(`id: 01\n`);
+  ctx.res.write(`id: ${id}\n`);
   ctx.res.write(`data: ${message}\n\n`);
 }
 

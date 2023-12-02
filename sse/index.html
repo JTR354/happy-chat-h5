@@ -9,20 +9,27 @@
     <h1>SSE</h1>
     <button>call api</button>
     <script>
+      const endPoint = "/api/close-account";
+      let id = "";
       document.querySelector("button").addEventListener("click", () => {
-        fetch("/api/show", { method: "POST" })
+        fetch(endPoint, { method: "POST" })
           .then((res) => res.json())
           .then((res) => {
             console.log(res);
+            id = "" + res.id;
           });
-        const evtSource = new EventSource("/api/show");
+        const evtSource = new EventSource(endPoint);
         evtSource.onopen = function () {
           console.log("open");
         };
         evtSource.onmessage = function (e) {
           console.log(e, "message");
-          console.log(JSON.parse(e.data));
-          evtSource.close();
+          console.log(e.lastEventId);
+          // UI to match the id
+          if (String(e.lastEventId) === id) {
+            console.log(JSON.parse(e.data));
+            evtSource.close();
+          }
         };
         evtSource.onerror = function (err) {
           console.log(err, "error");
