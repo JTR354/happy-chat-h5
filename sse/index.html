@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSE</title>
+  </head>
+  <body>
+    <h1>SSE</h1>
+    <button>call api</button>
+    <script>
+      document.querySelector("button").addEventListener("click", () => {
+        fetch("/api/show", { method: "POST" })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res);
+          });
+        const evtSource = new EventSource("/api/show");
+        evtSource.onopen = function () {
+          console.log("open");
+        };
+        evtSource.onmessage = function (e) {
+          console.log(e, "message");
+          console.log(JSON.parse(e.data));
+          evtSource.close();
+        };
+        evtSource.onerror = function (err) {
+          console.log(err, "error");
+        };
+      });
+    </script>
+  </body>
+</html>
